@@ -68,6 +68,7 @@
             <input type="text" id="pfAvatar" placeholder="avatar url" oninput="Avatar.preview()">
             <div id="pfAvatarPrev" style="margin-top:10px"></div></div>
           <div><label class="f">Owner Badge</label><input type="text" id="pfBadge"></div>
+          <div><label class="f">الحالة الحية Status (تظهر تحت الشارة)</label><input type="text" id="pfStatus" placeholder="Coding..."></div>
           <div><label class="f">الاسم العربي</label><input type="text" id="pfNameAr"></div>
           <div><label class="f">Name (EN)</label><input type="text" id="pfNameEn"></div>
           <div><label class="f">الموقع (عربي)</label><input type="text" id="pfLocAr"></div>
@@ -83,8 +84,34 @@
           <div class="full"><label class="f">Journey (EN)</label><textarea id="pfJourneyEn"></textarea></div>
           <div class="full"><label class="f">Skills (عربي — مفصول بفاصلة)</label><input type="text" id="pfSkillsAr"></div>
           <div class="full"><label class="f">Skills (EN)</label><input type="text" id="pfSkillsEn"></div>
+          <div class="full" style="border:1px solid rgba(var(--accent-rgb),0.3); border-radius:12px; padding:12px; background:rgba(255,255,255,0.02)">
+            <label class="f">🖼️ صورة قسم "عني" About Me Image</label>
+            <input type="file" accept="image/*" id="pfAboutImgFile">
+            <div class="hint">أو ألصق رابط صورة</div>
+            <input type="text" id="pfAboutImg" placeholder="about me image url" oninput="AboutImg.preview()">
+            <div id="pfAboutPrev" style="margin-top:10px"></div>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr 1fr; margin-top:10px">
+              <div><label class="f">العرض px (0=تلقائي)</label><input type="number" id="pfAboutW" value="0" min="0"></div>
+              <div><label class="f">الارتفاع px (0=تلقائي)</label><input type="number" id="pfAboutH" value="0" min="0"></div>
+              <div><label class="f">المحاذاة</label>
+                <select id="pfAboutAlign">
+                  <option value="center">منتصف</option>
+                  <option value="left">يسار</option>
+                  <option value="right">يمين</option>
+                </select></div>
+              <div><label class="f">نمط القص</label>
+                <select id="pfAboutFit">
+                  <option value="cover">cover</option>
+                  <option value="contain">contain</option>
+                  <option value="fill">fill</option>
+                  <option value="none">none</option>
+                </select></div>
+            </div>
+            <div class="hint" style="margin-top:6px">🧩 object-fit يتحكم بكيفية قص الصورة داخل الإطار المحدد (cover = قصت متمركزة، contain = كاملة داخل الإطار).</div>
+          </div>
         </div>
-        <div style="margin-top:18px"><button class="btn btn-primary" onclick="Profile.save()">حفظ الملف</button></div>
+        <div style="margin-top:18px"><button class="btn btn-primary" onclick="Profile.save()">حفظ الملف</button>
+        <button class="btn btn-ghost" onclick="Preview.open()" style="margin-inline-start:10px">👁 معاينة قبل الحفظ</button></div>
       </div>
     </div>
 
@@ -127,6 +154,7 @@
           <div><label class="f">الوصف (عربي)</label><textarea id="prDescAr"></textarea></div>
           <div><label class="f">Description (EN)</label><textarea id="prDescEn"></textarea></div>
           <div><label class="f">الوسوم Tags (فاصلة)</label><input type="text" id="prTags" placeholder="C++, ImGui, Windows"></div>
+          <div><label class="f">ألوان الوسوم (فاصلة — بنفس الترتيب)</label><input type="text" id="prTagColors" placeholder="#ff5f6d, #3ee6c3, #7c3aed (اختياري)"></div>
           <div><label class="f">لون المشروع</label><input type="color" id="prColor" value="#7c3aed"></div>
           <div><label class="f">نوع الوسائط</label>
             <select id="prMediaType">
@@ -134,7 +162,10 @@
               <option value="video">فيديو (Video MP4)</option>
             </select></div>
           <div><label class="f">صورة المشروع (اختياري)</label><input type="file" accept="image/*" id="prImgFile"><input type="text" id="prImgUrl" placeholder="or image url" style="margin-top:6px"></div>
+          <div><label class="f">ارتفاع صورة المشروع px (0=تلقائي)</label><input type="number" id="prImgH" value="0" min="0"></div>
           <div><label class="f">فيديو المشروع (اختياري — MP4)</label><input type="file" accept="video/mp4" id="prVidFile"><input type="text" id="prVidUrl" placeholder="or video url" style="margin-top:6px"></div>
+          <div><label class="f">تفاصيل إضافية (عربي — للنافذة المنبثقة)</label><textarea id="prDetailsAr" placeholder="وصف أطول يظهر عند الضغط على تفاصيل"></textarea></div>
+          <div><label class="f">Details (EN — للنافذة المنبثقة)</label><textarea id="prDetailsEn"></textarea></div>
           <div><label class="f">رابط التحميل Download</label><input type="url" id="prDownload"></div>
           <div><label class="f">رابط GitHub</label><input type="url" id="prGithub"></div>
           <div><label class="f">رابط خارجي / Live</label><input type="url" id="prExternal"></div>
@@ -200,7 +231,18 @@
             </select></div>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="Appearance.save()">حفظ المظهر</button>
+      <div class="card">
+          <h2>التأثيرات التفاعلية (سايبر)</h2>
+          <div class="form-grid">
+            <div><label class="f">أثر المؤشر المتوهج Cursor Trail</label>
+              <select id="apCursor"><option value="true">مفعّل</option><option value="false">معطّل</option></select></div>
+            <div><label class="f">لون الأثر</label><input type="color" id="apCursorColor" value="#7c3aed"></div>
+            <div><label class="f">أصوات النقر الخفيفة Micro SFX</label>
+              <select id="apSfx"><option value="true">مفعّل</option><option value="false">معطّل</option></select></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="Appearance.save()">حفظ المظهر</button>
+        <button class="btn btn-ghost" onclick="Preview.open()" style="margin-inline-start:10px">👁 معاينة قبل الحفظ</button>
     </div>
 
     <!-- MEDIA -->
@@ -280,6 +322,7 @@
         <div class="hint" style="margin-top:8px">💡 إذا أضفت أغانٍ هنا فستحل القائمة محل المقطوعة الرئيسية — يُشغَّل أول مقطع عند ظهور اللاعب، وكل مقطع يتبعه الذي يليه، مع التقطيع لكل مقطع على حدة.</div>
       </div>
       <button class="btn btn-primary" onclick="Media.save()">حفظ الوسائط</button>
+        <button class="btn btn-ghost" onclick="Preview.open()" style="margin-inline-start:10px">👁 معاينة قبل الحفظ</button>
     </div>
 
     <!-- DISCORD -->
