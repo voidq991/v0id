@@ -98,12 +98,25 @@
     if (sess && sess.user) {
       $('loginScreen').style.display = 'none';
       $('dash').style.display = 'flex';
-      loadAll();
+      verifyOwner(sess.user).then(loadAll);
     } else {
       $('loginScreen').style.display = 'flex';
       $('dash').style.display = 'none';
       editMode = null;
     }
+  }
+
+  // first login becomes THE owner; everyone else gets kicked out
+  async function verifyOwner(user) {
+    try {
+      const { data: claimed } = await supabase.rpc('register_owner');
+      const { data: ok } = await supabase.rpc('is_owner');
+      if (claimed) { toast('تم تفعيل صلاحية المالك ✓'); return; }
+      if (!ok) {
+        toast('هذا الحساب ليس المالك.');
+        await supabase.auth.signOut();
+      }
+    } catch (e) { toast('لا يمكن التحقق من المالك: ' + e.message); }
   }
 
   // ============================================================

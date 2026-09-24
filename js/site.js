@@ -34,10 +34,13 @@
   function mediaUrl(path) {
     if (!path) return '';
     if (/^(https?:)?\/\//.test(path)) return path;
+    // repo-relative assets live next to the site -> use as-is
+    if (path.startsWith('assets/')) return path;
+    // uploaded media lives in Supabase storage -> build public URL
     if (CFG.SUPABASE_URL.indexOf('PASTE_') === -1) {
       return CFG.SUPABASE_URL.replace(/\/$/, '') + '/storage/v1/object/public/media/' + path.replace(/^\//, '');
     }
-    return path;
+    return 'assets/' + path.replace(/^\//, '');
   }
 
   // ============================================================
