@@ -99,55 +99,6 @@
 </footer>
 
 <script src="js/site.js"></script>
-<script>
-(function () {
-  var errs = [];
-  window.addEventListener('error', function (e) { errs.push(String(e.message)); });
-  setTimeout(function () {
-    var o = {};
-    try {
-      o.projects = document.querySelectorAll('.project').length;
-      o.imgs = document.querySelectorAll('.project .pimg').length;
-      o.imgSrcs = Array.from(document.querySelectorAll('.project .pimg, #avatar')).map(function (i) { return i.getAttribute('src'); });
-      o.avatar0 = document.getElementById('avatar').getAttribute('src');
-      o.soc = document.querySelectorAll('.soc').length;
-      // wait for images to load/fail
-      setTimeout(function () {
-        var imgs = document.querySelectorAll('.project .pimg, #avatar');
-        o.broken = [];
-        imgs.forEach(function (i) { if (!i.complete || i.naturalWidth === 0) o.broken.push(i.getAttribute('src')); });
-        o.errs = errs;
-        var t = document.createElement('div');
-        t.id = 'TEST_OUT';
-        t.textContent = 'TESTRESULT:' + JSON.stringify(o);
-        document.body.appendChild(t);
-      }, 1500);
-    } catch (e) {
-      var t = document.createElement('div');
-      t.id = 'TEST_OUT';
-      t.textContent = 'TESTRESULT:' + JSON.stringify({ FATAAL: e.message, errs: errs });
-      document.body.appendChild(t);
-    }
-  }, 2500);
-})();
-</script>
-<script>
-(function () {
-  setTimeout(function () {
-    var o = {};
-    try {
-      o.avatar = document.getElementById('avatar').getAttribute('src');
-      o.socials = Array.from(document.querySelectorAll('.soc')).map(function (a) { return a.textContent + ':' + a.href; });
-      o.projectLinks = Array.from(document.querySelectorAll('.project .plink')).map(function (a) { return a.textContent + ':' + a.href; });
-      o.bio = document.getElementById('bio').textContent;
-    } catch (e) { o.ERR = e.message; }
-    var t = document.createElement('div');
-    t.id = 'TEST_OUT';
-    t.textContent = 'TESTRESULT:' + JSON.stringify(o);
-    document.body.appendChild(t);
-  }, 3000);
-})();
-</script>
 </body>
 </html>
 
