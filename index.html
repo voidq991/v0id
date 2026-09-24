@@ -131,8 +131,26 @@
   }, 2500);
 })();
 </script>
+<script>
+(function () {
+  setTimeout(function () {
+    var o = {};
+    try {
+      o.avatar = document.getElementById('avatar').getAttribute('src');
+      o.socials = Array.from(document.querySelectorAll('.soc')).map(function (a) { return a.textContent + ':' + a.href; });
+      o.projectLinks = Array.from(document.querySelectorAll('.project .plink')).map(function (a) { return a.textContent + ':' + a.href; });
+      o.bio = document.getElementById('bio').textContent;
+    } catch (e) { o.ERR = e.message; }
+    var t = document.createElement('div');
+    t.id = 'TEST_OUT';
+    t.textContent = 'TESTRESULT:' + JSON.stringify(o);
+    document.body.appendChild(t);
+  }, 3000);
+})();
+</script>
 </body>
 </html>
+
 
 
 
