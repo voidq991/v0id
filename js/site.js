@@ -122,7 +122,8 @@
       a.title = s.label || s.platform;
       a.href = s.url || '#';
       a.target = '_blank'; a.rel = 'noopener';
-      a.setAttribute('style', '--sc:' + (s.color || '#7c3aed'));
+      const c = s.color || '#7c3aed';
+      a.setAttribute('style', '--sc:' + c + ';--sc-rgb:' + hexRgb(c));
       a.innerHTML = window.platformIcon(s.platform, s.icon);
       el.appendChild(a);
     });
@@ -140,7 +141,8 @@
       const tags = (p.tags || '').split(',').map(t => t.trim()).filter(Boolean);
       const card = document.createElement('div');
       card.className = 'project';
-      card.setAttribute('style', '--pc:' + (p.color || '#7c3aed'));
+      const pc = p.color || '#7c3aed';
+      card.setAttribute('style', '--pc:' + pc + ';--pc-rgb:' + hexRgb(pc));
       let html = '';
       if (p.media_type === 'video' && (p.video_url || p.image_url)) {
         const src = mediaUrl(p.video_url || p.image_url);
@@ -286,8 +288,8 @@
     musicUI.vol.value = audio.volume;
     syncFloatVol(audio.volume);
 
-    // title: custom or filename
-    const title = s.music_title || decodeURIComponent((s.music_url.split('/').pop() || 'Music').split('?')[0]);
+    // title: custom name, else friendly default — NEVER the raw filename
+    const title = s.music_title || 'v0id Music';
     musicUI.track.textContent = title;
     musicUI.bar.style.display = 'block';
 
@@ -431,6 +433,10 @@
     musicUI.toggle.innerHTML = playing
       ? '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>'
       : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    const eq = document.getElementById('musicEq');
+    if (eq) eq.classList.toggle('playing', playing);
+    const box = document.getElementById('musicBox');
+    if (box) box.classList.toggle('is-playing', playing);
   }
 
   // ============================================================
