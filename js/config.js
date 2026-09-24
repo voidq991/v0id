@@ -5,7 +5,7 @@
 // ============================================================
 
 window.APP_CONFIG = {
-  SUPABASE_URL: "PASTE_YOUR_SUPABASE_URL_HERE",        // e.g. https://xyzcompany.supabase.co
-  SUPABASE_ANON_KEY: "PASTE_YOUR_SUPABASE_ANON_KEY_HERE",
+  SUPABASE_URL: "https://blhxvvsesnhnfzhrvrnz.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_QaRvV59bmsV8MZrSgRiF8A_cuWws1OT",
   LANYARD_API: "https://api.lanyard.rest/v1/users/",
 };
