@@ -76,6 +76,19 @@
   }
 
   // ============================================================
+  //  MUSIC PANEL — main track / playlist tabs
+  // ============================================================
+  window.MusicPanel = {
+    tab(name) {
+      const track = $('musicTrackTab'), pl = $('musicPlaylistTab');
+      if (track) track.style.display = name === 'track' ? 'block' : 'none';
+      if (pl) pl.style.display = name === 'playlist' ? 'block' : 'none';
+      const segs = document.querySelectorAll('[data-panel="music"] .seg button');
+      segs.forEach(b => b.classList.toggle('active', b.textContent.indexOf('المقطوعة') > -1 ? name === 'track' : name === 'playlist'));
+    },
+  };
+
+  // ============================================================
   //  SESSION STATE MACHINE
   // ============================================================
   document.addEventListener('DOMContentLoaded', async () => {
@@ -289,8 +302,9 @@
         '<div class="li-actions">' +
         '<button class="btn btn-ghost btn-sm" onclick="Socials.edit(\'' + s.id + '\')">تعديل</button>' +
         '<button class="btn btn-danger btn-sm" onclick="Socials.del(\'' + s.id + '\')">حذف</button></div>';
-      box.appendChild(row);
+box.appendChild(row);
     });
+    Projects.previewForm();
   }
 
   window.Socials.add = async function () {
@@ -319,6 +333,7 @@
     setVal('scSort', String(data.sort_order));
     setVal('scIcon', data.icon);
     $('scAddTitle').textContent = 'تعديل الرابط';
+    Socials.autofill();
     const btn = document.querySelector('#scPanel .btn-primary');
     btn.textContent = 'حفظ التعديل';
     btn.onclick = () => Socials.update();
@@ -350,6 +365,39 @@
     toast('حُذف الرابط');
     loadSocials();
   };
+
+  const SOCIAL_DEFAULTS = {
+    discord: { label: 'Discord', color: '#5865F2' },
+    github: { label: 'GitHub', color: '#a78bfa' },
+    instagram: { label: 'Instagram', color: '#f43f96' },
+    youtube: { label: 'YouTube', color: '#ff4d4d' },
+    tiktok: { label: 'TikTok', color: '#3ee6c3' },
+    telegram: { label: 'Telegram', color: '#38bdf8' },
+    x: { label: 'X / Twitter', color: '#e2e8f0' },
+    custom: { label: 'Custom', color: '#7c3aed' },
+  };
+
+  window.Socials.autofill = function () {
+    const p = val('scPlatform');
+    const d = SOCIAL_DEFAULTS[p] || SOCIAL_DEFAULTS.custom;
+    if (!val('scLabel')) setVal('scLabel', d.label);
+    if (document.activeElement !== $('scColor')) setVal('scColor', d.color);
+    const pw = $('scPrev');
+    if (!pw) return;
+    const color = val('scColor') || d.color;
+    const label = val('scLabel') || d.label;
+    const url = val('scUrl');
+    const icon = val('scIcon') || '';
+    const svg = icon ? '<img src="' + esc(icon) + '" alt="">' : (PLATFORM_ICONS[p] || PLATFORM_ICONS.custom);
+    pw.innerHTML =
+      '<div class="ico" style="background:' + color + '; box-shadow:0 0 18px' + color + '">' + svg + '</div>' +
+      '<div class="meta"><div class="t">' + esc(label) + '</div><div class="u">' + esc(url) + '</div></div>';
+  };
+  $('scPlatform') && $('scPlatform').addEventListener('change', () => Socials.autofill());
+  ['scColor', 'scUrl'].forEach(id => {
+    $(id) && $(id).addEventListener('input', () => Socials.autofill());
+    $(id) && $(id).addEventListener('change', () => Socials.autofill());
+  });
 
   // ============================================================
   //  PROJECTS
@@ -398,6 +446,7 @@
     if (error) { toast('خطأ: ' + error.message); return; }
     toast('أُضيف المشروع ✓');
     clearForm(['prTitleAr', 'prTitleEn', 'prDescAr', 'prDescEn', 'prDetailsAr', 'prDetailsEn', 'prTags', 'prTagColors', 'prImgUrl', 'prVidUrl', 'prDownload', 'prGithub', 'prExternal', 'prSort', 'prImgH']);
+    Projects.previewForm();
     loadProjects();
   };
 
@@ -418,6 +467,7 @@
     setVal('prGithub', data.github_url);
     setVal('prExternal', data.external_url);
     setVal('prSort', String(data.sort_order));
+    Projects.previewForm();
     const btn = document.querySelector('#prPanel .btn-primary');
     btn.textContent = 'حفظ التعديل';
     btn.onclick = () => Projects.update();
@@ -447,6 +497,7 @@
     toast('تم التعديل ✓');
     editMode = null;
     clearForm(['prTitleAr', 'prTitleEn', 'prDescAr', 'prDescEn', 'prDetailsAr', 'prDetailsEn', 'prTags', 'prTagColors', 'prImgUrl', 'prVidUrl', 'prDownload', 'prGithub', 'prExternal', 'prSort', 'prImgH']);
+    Projects.previewForm();
     const btn = document.querySelector('#prPanel .btn-primary');
     btn.textContent = 'إضافة المشروع';
     btn.onclick = () => Projects.add();
@@ -460,6 +511,35 @@
     toast('حُذف المشروع');
     loadProjects();
   };
+
+  // live mini-card preview while typing (visual color + glow + tag chips)
+  window.Projects.previewForm = function () {
+    const box = $('prPrev');
+    if (!box) return;
+    const color = val('prColor') || '#7c3aed';
+    const title = val('prTitleAr') || val('prTitleEn') || '';
+    const desc = val('prDescAr') || val('prDescEn') || '';
+    const tags = (val('prTags') || '').split(',').map(t => t.trim()).filter(Boolean);
+    const tagC = (val('prTagColors') || '').split(',').map(t => t.trim()).filter(Boolean);
+    let media = '';
+    if (val('prImgUrl')) media = '<img src="' + esc(val('prImgUrl')) + '" onerror="this.style.display=\'none\'">';
+    else if (val('prVidUrl')) media = '<video src="' + esc(val('prVidUrl')) + '" muted playsinline></video>';
+    const tagHtml = tags.map((t, i) =>
+      '<span class="pm-tag" style="background:' + (tagC[i] || color) + '; box-shadow:0 0 10px ' + (tagC[i] || color) + '">' + esc(t) + '</span>').join('');
+    box.innerHTML =
+      (title || media || tags.length || desc
+        ? '<div class="pm-media">' + media + '</div>' +
+          '<div class="pm-body">' +
+            '<div class="pm-title" style="color:' + color + '; text-shadow:0 0 14px ' + color + '">' + esc(title) + '</div>' +
+            '<div class="pm-desc">' + esc(desc) + '</div>' +
+            (tagHtml ? '<div class="pm-tags">' + tagHtml + '</div>' : '') +
+          '</div>'
+        : '<div class="pm-body"><div class="pm-desc">املأ الحقول وستظهر معاينة حية للبطاقة هنا (اللون والتوهج والوسوم).</div></div>');
+  };
+  ['prTitleAr', 'prTitleEn', 'prDescAr', 'prDescEn', 'prTags', 'prTagColors', 'prImgUrl', 'prVidUrl'].forEach(id => {
+    $(id) && $(id).addEventListener('input', () => Projects.previewForm());
+  });
+  $('prColor') && $('prColor').addEventListener('change', () => Projects.previewForm());
 
   // ============================================================
   //  ABOUT SECTIONS
@@ -542,6 +622,7 @@
     setVal('apGlow', s.glow_intensity); setVal('apGlowV', s.glow_intensity);
     setVal('apFont1', s.font_primary); setVal('apFont2', s.font_secondary);
     setVal('mdType', s.bg_type); setVal('mdUrl', s.bg_url);
+    setVal('mdSize', s.bg_size || 'cover'); setVal('mdPos', s.bg_pos || 'center');
     setVal('mdBlur', s.bg_blur); setVal('mdBlurV', s.bg_blur);
     setVal('mdDim', s.bg_dim); setVal('mdDimV', s.bg_dim);
     setVal('mdGlow', s.bg_glow); setVal('mdGlowV', s.bg_glow);
@@ -550,9 +631,6 @@
     setVal('mdTEnd', s.music_end);
     setVal('mdTitle', s.music_title);
     setVal('mdCover', s.music_cover);
-    setVal('mdPStyle', s.music_pstyle || 'bg');
-    setVal('mdPColor', s.music_pcolor);
-    setVal('mdPBlur', s.music_pblur); setVal('mdPBlurV', s.music_pblur);
     setVal('mdAuto', String(s.music_autoplay));
     setVal('mdVol', s.music_volume); setVal('mdVolV', s.music_volume);
     setVal('apCursor', String(s.cursor_enabled !== false));
@@ -562,6 +640,12 @@
   }
 
   window.Appearance.save = async function () {
+    const bgFile = $('mdFile');
+    let bgUrl = val('mdUrl');
+    if (bgFile && bgFile.files.length) {
+      bgUrl = await uploadFile(bgFile.files[0], '/backgrounds/bg_' + Date.now() + ext(bgFile.files[0].name));
+      setVal('mdUrl', bgUrl);
+    }
     const payload = {
       color_accent: val('apAccent'),
       color_bg: val('apBg'),
@@ -571,12 +655,20 @@
       cursor_enabled: val('apCursor') === 'true',
       cursor_color: val('apCursorColor'),
       sound_fx: val('apSfx') === 'true',
+      bg_type: val('mdType'),
+      bg_url: bgUrl,
+      bg_size: val('mdSize') || 'cover',
+      bg_pos: val('mdPos') || 'center',
+      bg_blur: parseFloat(val('mdBlur')),
+      bg_dim: parseFloat(val('mdDim')),
+      bg_glow: parseFloat(val('mdGlow')),
     };
     const base = Object.assign({}, payload);
     delete base.cursor_enabled; delete base.cursor_color; delete base.sound_fx;
+    delete base.bg_size; delete base.bg_pos;
     const res = await updateRow('settings', payload, base);
     if (res && res.error) { toast('خطأ: ' + res.error.message); return; }
-    toast('تم حفظ المظهر ✓');
+    toast('تم حفظ التصميم والخلفية ✓');
   };
 
   // ============================================================
@@ -584,45 +676,34 @@
   // ============================================================
   window.Media = {};
   window.Media.save = async function () {
-    let bgUrl = val('mdUrl');
-    const bgFile = $('mdFile');
-    if (bgFile && bgFile.files.length) {
-      bgUrl = await uploadFile(bgFile.files[0], '/backgrounds/bg_' + Date.now() + ext(bgFile.files[0].name));
-    }
     let musicUrl = val('mdMusic');
     const mFile = $('mdMusicFile');
     if (mFile && mFile.files.length) {
       musicUrl = await uploadFile(mFile.files[0], '/music/track_' + Date.now() + ext(mFile.files[0].name));
+      setVal('mdMusic', musicUrl);
     }
     let coverUrl = val('mdCover');
     const cFile = $('mdCoverFile');
     if (cFile && cFile.files.length) {
       coverUrl = await uploadFile(cFile.files[0], '/covers/cover_' + Date.now() + ext(cFile.files[0].name));
+      setVal('mdCover', coverUrl);
     }
+    if (!musicUrl) { toast('أدخل رابط المقطوعة أو ارفع ملف MP3'); return; }
     const payload = {
-      bg_type: val('mdType'),
-      bg_url: bgUrl,
-      bg_blur: parseFloat(val('mdBlur')),
-      bg_dim: parseFloat(val('mdDim')),
-      bg_glow: parseFloat(val('mdGlow')),
       music_url: musicUrl,
       music_start: parseFloat(val('mdTStart')) || 0,
       music_end: parseFloat(val('mdTEnd')) || 0,
       music_title: val('mdTitle').trim(),
-      music_cover: coverUrl,
-      music_pstyle: val('mdPStyle'),
-      music_pcolor: val('mdPColor') || null,
-      music_pblur: parseFloat(val('mdPBlur')) || 10,
+      music_cover: coverUrl || null,
       music_autoplay: val('mdAuto') === 'true',
       music_volume: parseFloat(val('mdVol')),
     };
     const base = Object.assign({}, payload);
     delete base.music_start; delete base.music_end; delete base.music_title;
-    delete base.music_cover; delete base.music_pstyle; delete base.music_pcolor;
-    delete base.music_pblur; delete base.music_autoplay;
+    delete base.music_cover; delete base.music_autoplay;
     const res = await updateRow('settings', payload, base);
     if (res && res.error) { toast('خطأ: ' + res.error.message); return; }
-    toast('تم حفظ الوسائط ✓');
+    toast('تم حفظ الموسيقى ✓');
   };
 
   // ============================================================
@@ -648,7 +729,7 @@
         '<div class="pl-actions">' +
           '<button class="btn btn-sm btn-ghost" onclick="Playlist.up(' + i + ')">▲</button>' +
           '<button class="btn btn-sm btn-ghost" onclick="Playlist.down(' + i + ')">▼</button>' +
-          '<button class="btn btn-sm btn-danger" onclick="Playlist.del("' + t.id + '")">حذف</button>' +
+          '<button class="btn btn-sm btn-danger" onclick="Playlist.del(\'' + t.id + '\')">حذف</button>' +
         '</div>' +
       '</div>'
     )).join('');
@@ -732,6 +813,82 @@
     return await uploadFile(f, basePath + ext(f.name));
   }
 
+  // drag & drop dropzone: click = picker, drag = file, live preview
+  function bindDrop(zoneId, inputId, previewId, opts) {
+    const zone = $(zoneId), inp = $(inputId), prev = $(previewId);
+    if (!zone || !inp || !prev) return;
+    opts = opts || {};
+    zone.addEventListener('click', () => inp.click());
+    ['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, (e) => {
+      e.preventDefault(); e.stopPropagation(); zone.classList.add('drag');
+    }));
+    ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, (e) => {
+      e.preventDefault(); e.stopPropagation(); zone.classList.remove('drag');
+    }));
+    zone.addEventListener('drop', (e) => {
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!f) return;
+      inp.files = e.dataTransfer.files;
+      handlePick(f);
+    });
+    inp.addEventListener('change', () => {
+      const f = inp.files && inp.files[0];
+      if (f) handlePick(f);
+    });
+    function handlePick(f) {
+      const rd = new FileReader();
+      rd.onload = (ev) => { previewLocal(ev.target.result, f, prev); };
+      rd.readAsDataURL(f);
+      if (opts.onPick) opts.onPick(f);
+      if (opts.clearUrl) setVal(opts.clearUrl, '');
+    }
+  }
+
+  function previewLocal(dataUrl, file, prev) {
+    if (!prev) return;
+    let tag;
+    if ((file.type || '').indexOf('audio') === 0) {
+      tag = '<audio controls preload="metadata" src="' + dataUrl + '"></audio>';
+    } else if ((file.type || '').indexOf('video') === 0) {
+      tag = '<video src="' + dataUrl + '" muted playsinline></video>';
+    } else {
+      tag = '<img src="' + dataUrl + '" alt="preview">';
+    }
+    prev.innerHTML = tag;
+  }
+
+  // initialize dropzones
+  bindDrop('mdBgDrop', 'mdFile', 'mdBgPrev', { onPick: (f) => {
+    if (f.type && f.type.indexOf('video') === 0) setVal('mdType', 'video');
+    else setVal('mdType', f.type === 'image/gif' ? 'gif' : 'image');
+  }});
+  bindDrop('mdDrop', 'mdMusicFile', 'mdMusicPrev', { clearUrl: 'mdMusic' });
+  bindDrop('mdCoverDrop', 'mdCoverFile', 'mdCoverPrev', { clearUrl: 'mdCover' });
+  bindDrop('prImgDrop', 'prImgFile', 'prImgPrev', { onPick: () => setVal('prMediaType', 'image') });
+  bindDrop('prVidDrop', 'prVidFile', 'prVidPrev', { onPick: () => setVal('prMediaType', 'video') });
+
+  // remote-changer previews
+  $('mdCover') && $('mdCover').addEventListener('input', () => {
+    const v = val('mdCover').trim();
+    const prev = $('mdCoverPrev');
+    if (prev) prev.innerHTML = v ? '<img src="' + esc(v) + '" alt="cover" onerror="this.style.display=\'none\'">' : '';
+  });
+  $('mdUrl') && $('mdUrl').addEventListener('input', () => {
+    const v = val('mdUrl').trim();
+    const prev = $('mdBgPrev');
+    if (prev) prev.innerHTML = v ? '<img src="' + esc(v) + '" alt="bg" onerror="this.style.display=\'none\'">' : '';
+  });
+  $('prImgUrl') && $('prImgUrl').addEventListener('input', () => {
+    const v = val('prImgUrl').trim();
+    const prev = $('prImgPrev');
+    if (prev) prev.innerHTML = v ? '<img src="' + esc(v) + '" alt="img" onerror="this.style.display=\'none\'">' : '';
+  });
+  $('prVidUrl') && $('prVidUrl').addEventListener('input', () => {
+    const v = val('prVidUrl').trim();
+    const prev = $('prVidPrev');
+    if (prev) prev.innerHTML = v ? '<video src="' + esc(v) + '" muted playsinline></video>' : '';
+  });
+
   // update with graceful fallback when new columns aren't migrated yet
   async function updateRow(table, fullPayload, basePayload, rowId) {
     const { error } = await supabase.from(table).update(fullPayload).eq('id', rowId || 1);
@@ -805,10 +962,10 @@
         color_accent: 'apAccent', color_bg: 'apBg', glow_intensity: 'apGlow',
         font_primary: 'apFont1', font_secondary: 'apFont2',
         cursor_enabled: 'apCursor', cursor_color: 'apCursorColor', sound_fx: 'apSfx',
-        bg_type: 'mdType', bg_url: 'mdUrl', bg_blur: 'mdBlur', bg_dim: 'mdDim', bg_glow: 'mdGlow',
+        bg_type: 'mdType', bg_url: 'mdUrl', bg_blur: 'mdBlur', bg_dim: 'mdDim',
+        bg_glow: 'mdGlow', bg_size: 'mdSize', bg_pos: 'mdPos',
         music_url: 'mdMusic', music_start: 'mdTStart', music_end: 'mdTEnd',
-        music_title: 'mdTitle', music_cover: 'mdCover', music_pstyle: 'mdPStyle',
-        music_pcolor: 'mdPColor', music_pblur: 'mdPBlur', music_autoplay: 'mdAuto',
+        music_title: 'mdTitle', music_cover: 'mdCover', music_autoplay: 'mdAuto',
         music_volume: 'mdVol', discord_user_id: 'dcId',
       };
       Object.keys(stKeys).forEach(k => { sett[k] = val(stKeys[k]); });
@@ -816,7 +973,8 @@
       sett.bg_blur = parseFloat(sett.bg_blur) || 0;
       sett.bg_dim = parseFloat(sett.bg_dim) || 0.5;
       sett.bg_glow = parseFloat(sett.bg_glow) || 0.4;
-      sett.music_pblur = parseFloat(sett.music_pblur) || 10;
+      sett.bg_size = sett.bg_size || 'cover';
+      sett.bg_pos = sett.bg_pos || 'center';
       sett.music_volume = parseFloat(sett.music_volume) || 0.5;
       sett.cursor_enabled = String(sett.cursor_enabled) === 'true';
       sett.sound_fx = String(sett.sound_fx) === 'true';

@@ -64,6 +64,8 @@
     root.setProperty('--bg-blur', (s.bg_blur || 0) + 'px');
     root.setProperty('--bg-dim', s.bg_dim != null ? s.bg_dim : 0.5);
     root.setProperty('--bg-glow', s.bg_glow != null ? s.bg_glow : 0.4);
+    root.setProperty('--bg-fit', s.bg_size || 'cover');
+    root.setProperty('--bg-pos', s.bg_pos || 'center');
 
     let html = '';
     if (s.bg_type === 'video' && s.bg_url) {

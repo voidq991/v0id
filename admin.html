@@ -43,13 +43,14 @@
 <div class="admin-shell" id="dash" style="display:none">
   <aside class="sidebar">
     <div class="brand"><span class="dot"></span>v0id</div>
+    <button class="btn btn-preview" onclick="Preview.open()">👁 معاينة فورية</button>
     <nav>
       <button data-panel="profile" class="active">الملف الشخصي</button>
-      <button data-panel="socials">الروابط الاجتماعية</button>
-      <button data-panel="projects">إدارة المشاريع</button>
+      <button data-panel="projects">المشاريع</button>
+      <button data-panel="socials">الروابط</button>
       <button data-panel="about">صفحة "عني"</button>
-      <button data-panel="appearance">المظهر والخطوط</button>
-      <button data-panel="media">الخلفية والموسيقى</button>
+      <button data-panel="design">التصميم والخلفية</button>
+      <button data-panel="music">الموسيقى</button>
       <button data-panel="discord">Discord</button>
       <button class="logout" id="logoutBtn">تسجيل الخروج</button>
     </nav>
@@ -122,7 +123,7 @@
         <h2 id="scAddTitle">إضافة رابط جديد</h2>
         <div class="form-grid">
           <div><label class="f">المنصة Platform</label>
-            <select id="scPlatform">
+            <select id="scPlatform" onchange="Socials.autofill()">
               <option value="discord">Discord</option>
               <option value="github">GitHub</option>
               <option value="instagram">Instagram</option>
@@ -134,9 +135,10 @@
             </select></div>
           <div><label class="f">العنوان Label</label><input type="text" id="scLabel" placeholder="Discord"></div>
           <div><label class="f">الرابط URL</label><input type="url" id="scUrl" placeholder="https://..."></div>
-          <div><label class="f">لون التوهج</label><input type="color" id="scColor" value="#5865F2"></div>
+          <div><label class="f">اللون + التوهج</label><input type="color" id="scColor" value="#5865F2"></div>
           <div><label class="f">الترتيب (رقم)</label><input type="number" id="scSort" value="1"></div>
-          <div class="full"><label class="f">(اختياري) صورة أيقونة Custom</label><input type="text" id="scIcon" placeholder="https://.../icon.png"></div>
+          <div class="full"><label class="f">(اختياري) صورة أيقونة Custom</label><input type="text" id="scIcon" placeholder="https://.../icon.png" oninput="Socials.autofill()"></div>
+          <div class="full"><label class="f">معاينة حية</label><div class="sc-prev" id="scPrev"></div></div>
         </div>
         <div style="margin-top:16px"><button class="btn btn-primary" onclick="Socials.add()">إضافة الرابط</button></div>
       </div>
@@ -161,9 +163,17 @@
               <option value="image">صورة (Image)</option>
               <option value="video">فيديو (Video MP4)</option>
             </select></div>
-          <div><label class="f">صورة المشروع (اختياري)</label><input type="file" accept="image/*" id="prImgFile"><input type="text" id="prImgUrl" placeholder="or image url" style="margin-top:6px"></div>
+          <div><label class="f">صورة المشروع (اسحب أو اختر)</label>
+            <label class="drop" id="prImgDrop"><input type="file" id="prImgFile" accept="image/*" hidden>
+              <span class="drop-ico">🖼️</span><span class="drop-txt">صورة بسيطة أو PREVIEW</span>
+              <div class="drop-prev" id="prImgPrev"></div></label>
+            <input type="text" id="prImgUrl" placeholder="أو رابط صورة" style="margin-top:6px"></div>
           <div><label class="f">ارتفاع صورة المشروع px (0=تلقائي)</label><input type="number" id="prImgH" value="0" min="0"></div>
-          <div><label class="f">فيديو المشروع (اختياري — MP4)</label><input type="file" accept="video/mp4" id="prVidFile"><input type="text" id="prVidUrl" placeholder="or video url" style="margin-top:6px"></div>
+          <div><label class="f">فيديو المشروع (اختياري — MP4)</label>
+            <label class="drop" id="prVidDrop"><input type="file" id="prVidFile" accept="video/mp4" hidden>
+              <span class="drop-ico">🎬</span><span class="drop-txt">فيديو MP4</span>
+              <div class="drop-prev" id="prVidPrev"></div></label>
+            <input type="text" id="prVidUrl" placeholder="أو رابط فيديو" style="margin-top:6px"></div>
           <div><label class="f">تفاصيل إضافية (عربي — للنافذة المنبثقة)</label><textarea id="prDetailsAr" placeholder="وصف أطول يظهر عند الضغط على تفاصيل"></textarea></div>
           <div><label class="f">Details (EN — للنافذة المنبثقة)</label><textarea id="prDetailsEn"></textarea></div>
           <div><label class="f">رابط التحميل Download</label><input type="url" id="prDownload"></div>
@@ -171,6 +181,7 @@
           <div><label class="f">رابط خارجي / Live</label><input type="url" id="prExternal"></div>
           <div><label class="f">الترتيب</label><input type="number" id="prSort" value="1"></div>
         </div>
+        <div class="proj-mini" id="prPrev"></div>
         <div style="margin-top:16px"><button class="btn btn-primary" onclick="Projects.add()">إضافة المشروع</button></div>
       </div>
       <div class="card"><h2>المشاريع الحالية</h2><div id="prList"></div></div>
@@ -195,13 +206,53 @@
       <div class="card"><h2>الأقسام الحالية</h2><div id="abList"></div></div>
     </div>
 
-    <!-- APPEARANCE -->
-    <div class="panel" data-panel="appearance" style="display:none">
-      <div class="page-head"><h1>المظهر، الخطوط والتوهج</h1><p>ثيم ديناميكي يتحكم بالموقع كامل</p></div>
+    <!-- DESIGN + BACKGROUND -->
+    <div class="panel" data-panel="design" style="display:none">
+      <div class="page-head"><h1>التصميم والخلفية</h1><p>ثيم ديناميكي واحد يتحكم بالموقع كامل</p></div>
+      <div class="card">
+        <h2>الخلفية Background</h2>
+        <div class="form-grid">
+          <div><label class="f">النوع</label>
+            <select id="mdType">
+              <option value="color">لون خالص</option>
+              <option value="image">صورة</option>
+              <option value="gif">GIF متحرك</option>
+              <option value="video">فيديو MP4 (loop)</option>
+            </select></div>
+          <div class="full"><label class="f">الملف (اسحب وأفلت أو اضغط)</label>
+            <label class="drop" id="mdBgDrop"><input type="file" id="mdFile" accept="image/*,video/mp4" hidden>
+              <span class="drop-ico">🖼️</span><span class="drop-txt">خلفية صورة / GIF / فيديو</span>
+              <div class="drop-prev" id="mdBgPrev"></div></label>
+          </div>
+          <div class="full"><label class="f">أو رابط مباشر URL</label><input type="url" id="mdUrl" placeholder="https://.../bg.mp4"></div>
+          <div><label class="f">طريقة الملء</label>
+            <select id="mdSize">
+              <option value="cover">cover (قص متمركز)</option>
+              <option value="contain">contain (كاملة)</option>
+              <option value="fill">fill (تمدد)</option>
+              <option value="auto">اصلي</option>
+            </select></div>
+          <div><label class="f">التموضع Position</label>
+            <select id="mdPos">
+              <option value="center">منتصف</option>
+              <option value="top">أعلى</option>
+              <option value="bottom">أسفل</option>
+              <option value="left">يسار</option>
+              <option value="right">يمين</option>
+            </select></div>
+          <div><label class="f">الضبابية Blur</label>
+            <div class="range-row"><input type="range" id="mdBlur" min="0" max="20" value="0"><span class="val" id="mdBlurV">0</span></div></div>
+          <div><label class="f">التعتيم Dim</label>
+            <div class="range-row"><input type="range" id="mdDim" min="0" max="1" step="0.05" value="0.5"><span class="val" id="mdDimV">0.5</span></div></div>
+          <div><label class="f">شدة التوهج Glow</label>
+            <div class="range-row"><input type="range" id="mdGlow" min="0" max="1" step="0.05" value="0.4"><span class="val" id="mdGlowV">0.4</span></div></div>
+          <div class="full"><button class="btn btn-primary" onclick="Appearance.save()">حفظ الخلفية والتصميم</button></div>
+        </div>
+      </div>
       <div class="card">
         <h2>الألوان والتوهج</h2>
         <div class="form-grid">
-          <div><label class="f">اللون الرئيسي Accent</label><input type="color" id="apAccent" value="#7c3aed"></div>
+          <div><label class="f">اللون الرئيسي Accent (اختر نيون — #f2f2f2 يلغي التوهج)</label><input type="color" id="apAccent" value="#7c3aed"></div>
           <div><label class="f">لون الخلفية</label><input type="color" id="apBg" value="#050308"></div>
           <div><label class="f">قوة التوهج Glow</label>
             <div class="range-row"><input type="range" id="apGlow" min="0" max="1" step="0.05" value="0.6"><span class="val" id="apGlowV">0.6</span></div></div>
@@ -232,97 +283,75 @@
         </div>
       </div>
       <div class="card">
-          <h2>التأثيرات التفاعلية (سايبر)</h2>
-          <div class="form-grid">
-            <div><label class="f">أثر المؤشر المتوهج Cursor Trail</label>
-              <select id="apCursor"><option value="true">مفعّل</option><option value="false">معطّل</option></select></div>
-            <div><label class="f">لون الأثر</label><input type="color" id="apCursorColor" value="#7c3aed"></div>
-            <div><label class="f">أصوات النقر الخفيفة Micro SFX</label>
-              <select id="apSfx"><option value="true">مفعّل</option><option value="false">معطّل</option></select></div>
-          </div>
+        <h2>التأثيرات التفاعلية (سايبر)</h2>
+        <div class="form-grid">
+          <div><label class="f">أثر المؤشر المتوهج Cursor Trail</label>
+            <select id="apCursor"><option value="true">مفعّل</option><option value="false">معطّل</option></select></div>
+          <div><label class="f">لون الأثر</label><input type="color" id="apCursorColor" value="#7c3aed"></div>
+          <div><label class="f">أصوات النقر الخفيفة Micro SFX</label>
+            <select id="apSfx"><option value="true">مفعّل</option><option value="false">معطّل</option></select></div>
         </div>
-        <button class="btn btn-primary" onclick="Appearance.save()">حفظ المظهر</button>
-        <button class="btn btn-ghost" onclick="Preview.open()" style="margin-inline-start:10px">👁 معاينة قبل الحفظ</button>
+      </div>
     </div>
 
-    <!-- MEDIA -->
-    <div class="panel" data-panel="media" style="display:none">
-      <div class="page-head"><h1>الخلفية والموسيقى</h1><p>محرّك الوسائط: صورة / GIF / فيديو + تشغيل موسيقى</p></div>
-      <div class="card">
-        <h2>الخلفية Background</h2>
-        <div class="form-grid">
-          <div><label class="f">النوع</label>
-            <select id="mdType">
-              <option value="color">لون خالص</option>
-              <option value="image">صورة</option>
-              <option value="gif">GIF متحرك</option>
-              <option value="video">فيديو MP4 (loop)</option>
-            </select></div>
-          <div class="full"><label class="f">الرابط URL</label><input type="url" id="mdUrl" placeholder="https://.../bg.mp4"></div>
-          <div><label class="f">رفع ملف</label><input type="file" id="mdFile" accept="image/*,video/mp4"></div>
-          <div><label class="f">الضبابية Blur</label>
-            <div class="range-row"><input type="range" id="mdBlur" min="0" max="20" value="0"><span class="val" id="mdBlurV">0</span></div></div>
-          <div><label class="f">التعتيم Dim</label>
-            <div class="range-row"><input type="range" id="mdDim" min="0" max="1" step="0.05" value="0.5"><span class="val" id="mdDimV">0.5</span></div></div>
-          <div><label class="f">شدة التوهج Glow</label>
-            <div class="range-row"><input type="range" id="mdGlow" min="0" max="1" step="0.05" value="0.4"><span class="val" id="mdGlowV">0.4</span></div></div>
-        </div>
+    <!-- MUSIC -->
+    <div class="panel" data-panel="music" style="display:none">
+      <div class="page-head"><h1>الموسيقى</h1><p>مقطوعة واحدة أو قائمة تشغيل — للأداة العائمة بدون أي تداخل</p></div>
+      <div class="seg">
+        <button class="active" onclick="MusicPanel.tab('track')">🎵 المقطوعة الرئيسية</button>
+        <button onclick="MusicPanel.tab('playlist')">📃 قائمة التشغيل</button>
       </div>
-      <div class="card">
-        <h2>الموسيقى Music</h2>
-        <div class="form-grid">
-          <div class="full"><label class="f">رابط المقطوعة URL (MP3)</label><input type="url" id="mdMusic" placeholder="https://.../track.mp3"></div>
-          <div><label class="f">رفع ملف MP3</label><input type="file" id="mdMusicFile" accept="audio/*"></div>
 
-          <!-- TRIM: only the part you want -->
-          <div class="full" style="border:1px solid rgba(var(--accent-rgb),0.3); border-radius:12px; padding:12px; background:rgba(255,255,255,0.02)">
-            <label class="f">✂️ تقطيع المقطع — شغّل فقط الجزء الذي تريد</label>
-            <div class="form-grid" style="grid-template-columns:1fr 1fr">
-              <div><label class="f">البداية (ثانية)</label><input type="number" id="mdTStart" min="0" step="0.1" value="0"></div>
-              <div><label class="f">النهاية (ثانية — 0 = كاملة)</label><input type="number" id="mdTEnd" min="0" step="0.1" value="0"></div>
+      <div id="musicTrackTab">
+        <div class="card">
+          <h2>المقطوعة الرئيسية + الغلاف</h2>
+          <div class="form-grid">
+            <div class="full"><label class="f">الملف الصوتي (اسحب وأفلت MP3 أو اضغط)</label>
+              <label class="drop" id="mdDrop"><input type="file" id="mdMusicFile" accept="audio/*" hidden>
+                <span class="drop-ico">🎵</span><span class="drop-txt">ملف MP3 للمقطوعة</span>
+                <div class="drop-prev" id="mdMusicPrev"></div></label>
             </div>
-            <div class="hint" style="margin-top:6px">مثال: عندك أغنية 3:00، اكتب البداية 45 والنهاية 90 → يشغّل من 0:45 حتى 1:30 فقط ثم يتوقف.</div>
+            <div class="full"><label class="f">أو رابط مباشر URL</label><input type="url" id="mdMusic" placeholder="https://.../track.mp3"></div>
+            <div><label class="f">اسم المغني / المقطع (الاسم الحقيقي فقط)</label><input type="text" id="mdTitle" placeholder="Night Drive — 0xKay"></div>
+            <div><label class="f">الغلاف Cover (اسحب أو رابط)</label>
+              <label class="drop" id="mdCoverDrop"><input type="file" id="mdCoverFile" accept="image/*" hidden>
+                <span class="drop-ico">🖼️</span><span class="drop-txt">صورة الغلاف</span>
+                <div class="drop-prev" id="mdCoverPrev"></div></label>
+              <input type="text" id="mdCover" placeholder="أو رابط صورة" style="margin-top:6px"></div>
+            <div class="full" style="border:1px solid rgba(var(--accent-rgb),0.3); border-radius:12px; padding:12px; background:rgba(255,255,255,0.02)">
+              <label class="f">✂️ التقطيع — شغّل الجزء الذي تريد فقط</label>
+              <div class="form-grid" style="grid-template-columns:1fr 1fr">
+                <div><label class="f">البداية (ثانية)</label><input type="number" id="mdTStart" min="0" step="0.1" value="0"></div>
+                <div><label class="f">النهاية (ثانية — 0 = كاملة)</label><input type="number" id="mdTEnd" min="0" step="0.1" value="0"></div>
+              </div>
+              <div class="hint" style="margin-top:6px">أغنية 3:00 → اكتب البداية 45 والنهاية 90 = يشغّل من 0:45 حتى 1:30 فقط.</div>
+            </div>
+            <div><label class="f">التشغيل التلقائي Autoplay</label>
+              <select id="mdAuto"><option value="false">لا</option><option value="true">نعم (بعد أول نقرة)</option></select></div>
+            <div><label class="f">مستوى الصوت</label>
+              <div class="range-row"><input type="range" id="mdVol" min="0" max="1" step="0.05" value="0.5"><span class="val" id="mdVolV">0.5</span></div></div>
           </div>
-
-          <div class="full"><label class="f">عنوان المقطوعة (الاسم الظاهر في اللاعب)</label><input type="text" id="mdTitle" placeholder="My Track"></div>
-          <div><label class="f">غلاف Music Cover</label><input type="file" id="mdCoverFile" accept="image/*">
-            <div class="hint">أو رابط صورة</div>
-            <input type="text" id="mdCover" placeholder="cover url"></div>
-
-          <!-- PLAYER LOOK -->
-          <div class="full"><label class="f">شكل اللاعب Player Style</label>
-            <select id="mdPStyle">
-              <option value="bg">نفس لون الخلفية (شفاف/مطابق)</option>
-              <option value="glass">زجاجي (Blur تمويه)</option>
-              <option value="image">بانر صورة</option>
-              <option value="glow">توهج متدرج</option>
-            </select></div>
-          <div><label class="f">لون اللاعب (اختياري)</label><input type="color" id="mdPColor" value="#7c3aed"></div>
-          <div><label class="f">تمويه اللاعب Blur</label>
-            <div class="range-row"><input type="range" id="mdPBlur" min="0" max="25" value="10"><span class="val" id="mdPBlurV">10</span></div></div>
-
-          <div><label class="f">التشغيل التلقائي Autoplay</label>
-            <select id="mdAuto"><option value="false">لا</option><option value="true">نعم (أول نقرة)</option></select></div>
-          <div><label class="f">مستوى الصوت</label>
-            <div class="range-row"><input type="range" id="mdVol" min="0" max="1" step="0.05" value="0.5"><span class="val" id="mdVolV">0.5</span></div></div>
+          <div style="margin-top:18px"><button class="btn btn-primary" onclick="Media.save()">حفظ الموسيقى</button>
+          <button class="btn btn-ghost" onclick="Preview.open()" style="margin-inline-start:10px">👁 معاينة</button></div>
         </div>
-
-        <!-- PLAYLIST -->
-        <h2 style="margin-top:22px">قائمة التشغيل Playlist</h2>
-        <div class="form-grid">
-          <div class="full"><label class="f">عنوان</label><input type="text" id="plTitle" placeholder="Track name"></div>
-          <div class="full"><label class="f">رابط MP3</label><input type="url" id="plUrl" placeholder="https://.../track.mp3"></div>
-          <div class="full"><label class="f">رفع MP3</label><input type="file" id="plFile" accept="audio/*"></div>
-          <div><label class="f">البداية (ثانية)</label><input type="number" id="plStart" min="0" step="0.1" value="0"></div>
-          <div><label class="f">النهاية (0 = كاملة)</label><input type="number" id="plEnd" min="0" step="0.1" value="0"></div>
-          <div><label class="f">غلاف</label><input type="text" id="plCover" placeholder="cover url"></div>
-        </div>
-        <div style="margin-top:14px"><button class="btn btn-primary" onclick="Playlist.add()">أضف للمشغّل</button></div>
-        <div class="list" id="plList" style="margin-top:18px"></div>
-        <div class="hint" style="margin-top:8px">💡 إذا أضفت أغانٍ هنا فستحل القائمة محل المقطوعة الرئيسية — يُشغَّل أول مقطع عند ظهور اللاعب، وكل مقطع يتبعه الذي يليه، مع التقطيع لكل مقطع على حدة.</div>
       </div>
-      <button class="btn btn-primary" onclick="Media.save()">حفظ الوسائط</button>
-        <button class="btn btn-ghost" onclick="Preview.open()" style="margin-inline-start:10px">👁 معاينة قبل الحفظ</button>
+
+      <div id="musicPlaylistTab" style="display:none">
+        <div class="card">
+          <h2>أضف أغنية للقائمة</h2>
+          <div class="form-grid">
+            <div class="full"><label class="f">عنوان الأغنية</label><input type="text" id="plTitle" placeholder="Track name"></div>
+            <div class="full"><label class="f">رابط MP3</label><input type="url" id="plUrl" placeholder="https://.../track.mp3"></div>
+            <div class="full"><label class="f">رفع MP3</label><input type="file" id="plFile" accept="audio/*"></div>
+            <div><label class="f">البداية (ثانية)</label><input type="number" id="plStart" min="0" step="0.1" value="0"></div>
+            <div><label class="f">النهاية (0 = كاملة)</label><input type="number" id="plEnd" min="0" step="0.1" value="0"></div>
+            <div><label class="f">غلاف</label><input type="text" id="plCover" placeholder="cover url"></div>
+          </div>
+          <div style="margin-top:14px"><button class="btn btn-primary" onclick="Playlist.add()">أضف للمشغّل</button></div>
+          <div class="list" id="plList" style="margin-top:18px"></div>
+          <div class="hint" style="margin-top:8px">💡 إذا أضفت أغانٍ هنا فستحل القائمة محل المقطوعة الرئيسية — يُشغّل أول مقطع عند ظهور الأداة، وكل مقطع يتبعه الذي يليه.</div>
+        </div>
+      </div>
     </div>
 
     <!-- DISCORD -->

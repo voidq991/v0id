@@ -220,3 +220,77 @@ input[type=range] { accent-color: var(--accent); cursor: pointer; }
 .pl-row .pl-title { font-weight: 700; font-size: 14px; }
 .pl-row .pl-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .pl-row .pl-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============================================================
+   DASHBOARD 2.0 — readability + dropzones + live previews
+   ============================================================ */
+/* bigger, roomier fields & buttons */
+input[type=text], input[type=url], input[type=number], input[type=email],
+input[type=password], select, textarea { padding: 13px 15px; font-size: 15px; }
+label.f { font-size: 13.5px; color: var(--muted); }
+.btn { padding: 13px 24px; font-size: 15px; }
+
+.btn-preview {
+  display: block; width: 100%; margin-bottom: 18px;
+  background: linear-gradient(135deg, #10b981, #3ee6c3);
+  color: #03130e; font-weight: 800; font-size: 15px;
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.55);
+  border-radius: 13px;
+}
+.btn-preview:hover { filter: brightness(1.08); }
+
+/* sticky quick preview in sidebar */
+.sidebar { display: flex; flex-direction: column; }
+.sidebar nav { flex: 1; }
+
+/* ---------- dropzones ---------- */
+.drop {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; text-align: center;
+  border: 2px dashed rgba(var(--accent-rgb), 0.35);
+  background: rgba(var(--accent-rgb), 0.06);
+  border-radius: 14px;
+  padding: 22px 16px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.drop:hover, .drop.drag { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.14); box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3); }
+.drop.drag { transform: scale(1.02); }
+.drop .drop-ico { font-size: 26px; }
+.drop .drop-txt { font-size: 13.5px; color: var(--muted); }
+.drop-prev { margin-top: 10px; max-width: 100%; }
+.drop-prev img, .drop-prev video { max-width: 100%; max-height: 150px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); display: block; margin: 0 auto; }
+.drop-prev audio { width: 100%; margin-top: 6px; }
+
+/* ---------- socials live preview ---------- */
+.sc-prev {
+  display: flex; align-items: center; gap: 12px;
+  background: #0d0920; border: 1px solid var(--border);
+  border-radius: 13px; padding: 14px 18px;
+}
+.sc-prev .ico { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sc-prev .ico svg { width: 22px; height: 22px; fill: #fff; }
+.sc-prev .ico img { width: 22px; height: 22px; }
+.sc-prev .meta { overflow: hidden; }
+.sc-prev .meta .t { font-weight: 700; font-size: 14.5px; }
+.sc-prev .meta .u { font-size: 12.5px; color: var(--muted); word-break: break-all; }
+
+/* ---------- project mini live preview ---------- */
+.proj-mini {
+  margin-top: 18px;
+  background: #0d0920; border: 1px solid var(--border); border-radius: 14px;
+  padding: 0; overflow: hidden;
+}
+.proj-mini .pm-media { position: relative; height: 150px; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; }
+.proj-mini .pm-media img { width: 100%; height: 100%; object-fit: cover; }
+.proj-mini .pm-body { padding: 14px 16px; }
+.proj-mini .pm-title { font-weight: 800; font-size: 16px; color: #fff; }
+.proj-mini .pm-desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.proj-mini .pm-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.pm-tag { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; color: #fff; }
+
+/* range rows same basline */
+.range-row input { min-height: 6px; }
+
+/* music tabs */
+.seg button { font-size: 15px; padding: 11px 24px; }

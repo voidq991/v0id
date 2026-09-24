@@ -15,6 +15,8 @@ window.DEMO_DATA = {
     color_bg: '#050308',
     bg_type: 'image',
     bg_url: 'assets/demo/bg-demo.png',
+    bg_size: 'cover',
+    bg_pos: 'center',
     bg_blur: 2,
     bg_dim: 0.55,
     bg_glow: 0.5,
