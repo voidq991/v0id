@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>v0id â€” Bio & Projects</title>
+<!-- Google Fonts (Space Grotesk + Inter + Cairo for AR) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/demo-data.js"></script>
+<script src="js/icons.js"></script>
+</head>
+<body class="lang-ar">
+
+<!-- ===== BACKGROUND MEDIA ENGINE ===== -->
+<div class="media-layer" id="mediaLayer"></div>
+<div class="media-dim" id="mediaDim"></div>
+<div class="media-glow" id="mediaGlow"></div>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav" id="nav">
+  <div class="brand" onclick="Go.to('home')"><span class="dot"></span>v0id</div>
+  <div class="nav-links">
+    <button data-nav="home"    class="active" data-i18n-flag="home">Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</button>
+    <button data-nav="projects" data-i18n-flag="projects">Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹</button>
+    <button data-nav="about"   data-i18n-flag="about">Ø¹Ù†ÙŠ</button>
+    <button class="lang-btn" data-i18n-lang>EN</button>
+  </div>
+</nav>
+
+<!-- ===== HOME ===== -->
+<section class="section active" id="sec-home">
+  <div class="wrap">
+    <div class="profile-card">
+      <div class="avatar-wrap">
+        <img class="avatar" id="avatar" src="" alt="avatar" onerror="this.style.visibility='hidden'">
+      </div>
+      <div class="owner-badge"><span class="check">âœ“</span><span id="ownerBadge">Owner</span></div>
+      <h1 class="display-name" id="displayName">v0id</h1>
+      <div class="meta-line" id="metaLine"></div>
+      <p class="bio" id="bio"></p>
+
+      <!-- Discord live presence -->
+      <div class="presence offline" id="presence" style="display:none">
+        <span class="pd"></span><span class="act" id="presenceText">offline</span>
+      </div>
+
+      <!-- Social links -->
+      <div class="socials" id="socials"></div>
+
+      <!-- Music player -->
+      <div class="musicbar" id="musicbar" style="display:none">
+        <div class="music-box">
+          <button class="music-btn" id="musicToggle" title="Music">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div class="music-ctrl">
+            <div class="music-track" id="musicTrack">â€”</div>
+            <input type="range" id="musicSeek" min="0" max="100" value="0">
+            <div class="vol-row">
+              <span class="vl" id="musicTime">0:00</span>
+              <input type="range" id="musicVol" min="0" max="1" step="0.02" value="0.5">
+              <span class="vl" id="musicDur">0:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:14px; font-size:12px; color:#8e80bd" id="musicHint"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROJECTS ===== -->
+<section class="section" id="sec-projects">
+  <div class="wrap">
+    <h2 class="sec-title" id="projectsTitle">Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹</h2>
+    <p class="sec-sub" id="projectsSub"></p>
+    <div class="projects-grid" id="projectsGrid"></div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section class="section" id="sec-about">
+  <div class="wrap">
+    <h2 class="sec-title" id="aboutTitle">Ø¹Ù†ÙŠ</h2>
+    <div class="narrative" id="aboutNarrative"></div>
+    <div class="about-grid" id="aboutGrid"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="font-display" style="font-weight:700; color:#cabdf5">v0id</div>
+  <div id="footerNote" style="margin-top:6px"></div>
+</footer>
+
+<script src="js/site.js"></script>
+</body>
+</html>
+
+

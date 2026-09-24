@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>v0id — Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800&family=Inter:wght@400;500;600&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/icons.js"></script>
+</head>
+<body lang="ar" dir="rtl">
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="login-wrap" id="loginScreen">
+  <div class="login-card">
+    <div class="brand">v0id <span style="color:#8f6bff">Admin</span></div>
+    <p class="sub" id="loginSub">
+      لوحة التحكم — سجّل الدخول لإدارة الموقع. أول مرة؟ اضغط ← أنشئ حساب المالك
+    </p>
+    <div class="field">
+      <label class="f">Email</label>
+      <input type="email" id="loginEmail" placeholder="you@email.com">
+    </div>
+    <div class="field">
+      <label class="f">Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" id="loginBtn">Login</button>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-alt">
+      <span id="loginAltText">لا تملك حساباً بعد؟</span>
+      <a id="loginAltLink" onclick="Auth.toggleMode()">أنشئ حساب المالك</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="admin-shell" id="dash" style="display:none">
+  <aside class="sidebar">
+    <div class="brand"><span class="dot"></span>v0id</div>
+    <nav>
+      <button data-panel="profile" class="active">الملف الشخصي</button>
+      <button data-panel="socials">الروابط الاجتماعية</button>
+      <button data-panel="projects">إدارة المشاريع</button>
+      <button data-panel="about">صفحة "عني"</button>
+      <button data-panel="appearance">المظهر والخطوط</button>
+      <button data-panel="media">الخلفية والموسيقى</button>
+      <button data-panel="discord">Discord</button>
+      <button class="logout" id="logoutBtn">تسجيل الخروج</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <!-- PROFILE -->
+    <div class="panel" data-panel="profile">
+      <div class="page-head"><h1>الملف الشخصي</h1><p>الاسم، الصورة، المقدمة، الأهداف — عربية وإنجليزية</p></div>
+      <div class="card">
+        <h2>البيانات الأساسية (ثنائية اللغة)</h2>
+        <div class="form-grid">
+          <div><label class="f">Avatar URL / File</label><input type="file" accept="image/*" id="pfAvatarFile"><div class="hint">أو</div><input type="text" id="pfAvatar" placeholder="avatar url"></div>
+          <div><label class="f">Owner Badge</label><input type="text" id="pfBadge"></div>
+          <div><label class="f">الاسم العربي</label><input type="text" id="pfNameAr"></div>
+          <div><label class="f">Name (EN)</label><input type="text" id="pfNameEn"></div>
+          <div><label class="f">الموقع (عربي)</label><input type="text" id="pfLocAr"></div>
+          <div><label class="f">Location (EN)</label><input type="text" id="pfLocEn"></div>
+          <div><label class="f">العمر / Age</label><input type="text" id="pfAge"></div>
+          <div><label class="f">المهنة (عربي)</label><input type="text" id="pfOccAr"></div>
+          <div><label class="f">Occupation (EN)</label><input type="text" id="pfOccEn"></div>
+          <div class="full"><label class="f">المقدمة Bio (عربي)</label><textarea id="pfBioAr"></textarea></div>
+          <div class="full"><label class="f">Bio (EN)</label><textarea id="pfBioEn"></textarea></div>
+          <div class="full"><label class="f">الأهداف Goals (عربي — سطر قصير)</label><input type="text" id="pfGoalsAr"></div>
+          <div class="full"><label class="f">Goals (EN)</label><input type="text" id="pfGoalsEn"></div>
+          <div class="full"><label class="f">الرحلة Journey (عربي)</label><textarea id="pfJourneyAr"></textarea></div>
+          <div class="full"><label class="f">Journey (EN)</label><textarea id="pfJourneyEn"></textarea></div>
+          <div class="full"><label class="f">Skills (عربي — مفصول بفاصلة)</label><input type="text" id="pfSkillsAr"></div>
+          <div class="full"><label class="f">Skills (EN)</label><input type="text" id="pfSkillsEn"></div>
+        </div>
+        <div style="margin-top:18px"><button class="btn btn-primary" onclick="Profile.save()">حفظ الملف</button></div>
+      </div>
+    </div>
+
+    <!-- SOCIALS -->
+    <div class="panel" id="scPanel" data-panel="socials" style="display:none">
+      <div class="page-head"><h1>الروابط الاجتماعية</h1><p>أيقونات متوهجة — إضافة / تعديل / حذف / ترتيب</p></div>
+      <div class="card">
+        <h2>إضافة رابط جديد</h2>
+        <div class="form-grid">
+          <div><label class="f">المنصة Platform</label>
+            <select id="scPlatform">
+              <option value="discord">Discord</option>
+              <option value="github">GitHub</option>
+              <option value="instagram">Instagram</option>
+              <option value="youtube">YouTube</option>
+              <option value="tiktok">TikTok</option>
+              <option value="telegram">Telegram</option>
+              <option value="x">X / Twitter</option>
+              <option value="custom">Custom</option>
+            </select></div>
+          <div><label class="f">العنوان Label</label><input type="text" id="scLabel" placeholder="Discord"></div>
+          <div><label class="f">الرابط URL</label><input type="url" id="scUrl" placeholder="https://..."></div>
+          <div><label class="f">لون التوهج</label><input type="color" id="scColor" value="#5865F2"></div>
+          <div><label class="f">الترتيب (رقم)</label><input type="number" id="scSort" value="1"></div>
+          <div class="full"><label class="f">(اختياري) صورة أيقونة Custom</label><input type="text" id="scIcon" placeholder="https://.../icon.png"></div>
+        </div>
+        <div style="margin-top:16px"><button class="btn btn-primary" onclick="Socials.add()">إضافة الرابط</button></div>
+      </div>
+      <div class="card"><h2>الروابط الحالية</h2><div id="scList"></div></div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="panel" id="prPanel" data-panel="projects" style="display:none">
+      <div class="page-head"><h1>إدارة المشاريع</h1><p>كل مشروع بلون خاص وتوهج مستقل</p></div>
+      <div class="card">
+        <h2>إضافة مشروع جديد</h2>
+        <div class="form-grid">
+          <div><label class="f">العنوان (عربي)</label><input type="text" id="prTitleAr"></div>
+          <div><label class="f">Title (EN)</label><input type="text" id="prTitleEn"></div>
+          <div><label class="f">الوصف (عربي)</label><textarea id="prDescAr"></textarea></div>
+          <div><label class="f">Description (EN)</label><textarea id="prDescEn"></textarea></div>
+          <div><label class="f">الوسوم Tags (فاصلة)</label><input type="text" id="prTags" placeholder="C++, ImGui, Windows"></div>
+          <div><label class="f">لون المشروع</label><input type="color" id="prColor" value="#7c3aed"></div>
+          <div><label class="f">نوع الوسائط</label>
+            <select id="prMediaType">
+              <option value="image">صورة (Image)</option>
+              <option value="video">فيديو (Video MP4)</option>
+            </select></div>
+          <div><label class="f">صورة المشروع (اختياري)</label><input type="file" accept="image/*" id="prImgFile"><input type="text" id="prImgUrl" placeholder="or image url" style="margin-top:6px"></div>
+          <div><label class="f">فيديو المشروع (اختياري — MP4)</label><input type="file" accept="video/mp4" id="prVidFile"><input type="text" id="prVidUrl" placeholder="or video url" style="margin-top:6px"></div>
+          <div><label class="f">رابط التحميل Download</label><input type="url" id="prDownload"></div>
+          <div><label class="f">رابط GitHub</label><input type="url" id="prGithub"></div>
+          <div><label class="f">رابط خارجي / Live</label><input type="url" id="prExternal"></div>
+          <div><label class="f">الترتيب</label><input type="number" id="prSort" value="1"></div>
+        </div>
+        <div style="margin-top:16px"><button class="btn btn-primary" onclick="Projects.add()">إضافة المشروع</button></div>
+      </div>
+      <div class="card"><h2>المشاريع الحالية</h2><div id="prList"></div></div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="panel" id="abPanel" data-panel="about" style="display:none">
+      <div class="page-head"><h1>صفحة "عني"</h1><p>أقسام قصص الحرافات والمهارات والأهداف</p></div>
+      <div class="card">
+        <h2>إضافة قسم جديد</h2>
+        <div class="form-grid">
+          <div><label class="f">العنوان (عربي)</label><input type="text" id="abTitleAr"></div>
+          <div><label class="f">Title (EN)</label><input type="text" id="abTitleEn"></div>
+          <div><label class="f">النص (عربي)</label><textarea id="abBodyAr"></textarea></div>
+          <div><label class="f">Body (EN)</label><textarea id="abBodyEn"></textarea></div>
+          <div><label class="f">الأيقونة (code)</label><input type="text" id="abIcon" placeholder="journey / skills / future / ..."></div>
+          <div><label class="f">الترتيب</label><input type="number" id="abSort" value="1"></div>
+          <div><label class="f">الرحلة Journey — هذه تظهر أعلى الصفحة</label><div class="hint">حررها من تبويب "الملف الشخصي" (حقل Journey)</div></div>
+        </div>
+        <div style="margin-top:16px"><button class="btn btn-primary" onclick="About.add()">إضافة القسم</button></div>
+      </div>
+      <div class="card"><h2>الأقسام الحالية</h2><div id="abList"></div></div>
+    </div>
+
+    <!-- APPEARANCE -->
+    <div class="panel" data-panel="appearance" style="display:none">
+      <div class="page-head"><h1>المظهر، الخطوط والتوهج</h1><p>ثيم ديناميكي يتحكم بالموقع كامل</p></div>
+      <div class="card">
+        <h2>الألوان والتوهج</h2>
+        <div class="form-grid">
+          <div><label class="f">اللون الرئيسي Accent</label><input type="color" id="apAccent" value="#7c3aed"></div>
+          <div><label class="f">لون الخلفية</label><input type="color" id="apBg" value="#050308"></div>
+          <div><label class="f">قوة التوهج Glow</label>
+            <div class="range-row"><input type="range" id="apGlow" min="0" max="1" step="0.05" value="0.6"><span class="val" id="apGlowV">0.6</span></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>الخطوط (Google Fonts)</h2>
+        <div class="form-grid">
+          <div><label class="f">الخط الأساسي (عناوين)</label>
+            <select id="apFont1">
+              <option value="Space Grotesk">Space Grotesk</option>
+              <option value="Orbitron">Orbitron</option>
+              <option value="Montserrat">Montserrat</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Inter">Inter</option>
+              <option value="Cairo">Cairo</option>
+              <option value="Tajawal">Tajawal</option>
+            </select></div>
+          <div><label class="f">الخط الثانوي (النصوص)</label>
+            <select id="apFont2">
+              <option value="Inter">Inter</option>
+              <option value="Space Grotesk">Space Grotesk</option>
+              <option value="Montserrat">Montserrat</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Cairo">Cairo</option>
+              <option value="Tajawal">Tajawal</option>
+            </select></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="Appearance.save()">حفظ المظهر</button>
+    </div>
+
+    <!-- MEDIA -->
+    <div class="panel" data-panel="media" style="display:none">
+      <div class="page-head"><h1>الخلفية والموسيقى</h1><p>محرّك الوسائط: صورة / GIF / فيديو + تشغيل موسيقى</p></div>
+      <div class="card">
+        <h2>الخلفية Background</h2>
+        <div class="form-grid">
+          <div><label class="f">النوع</label>
+            <select id="mdType">
+              <option value="color">لون خالص</option>
+              <option value="image">صورة</option>
+              <option value="gif">GIF متحرك</option>
+              <option value="video">فيديو MP4 (loop)</option>
+            </select></div>
+          <div class="full"><label class="f">الرابط URL</label><input type="url" id="mdUrl" placeholder="https://.../bg.mp4"></div>
+          <div><label class="f">رفع ملف</label><input type="file" id="mdFile" accept="image/*,video/mp4"></div>
+          <div><label class="f">الضبابية Blur</label>
+            <div class="range-row"><input type="range" id="mdBlur" min="0" max="20" value="0"><span class="val" id="mdBlurV">0</span></div></div>
+          <div><label class="f">التعتيم Dim</label>
+            <div class="range-row"><input type="range" id="mdDim" min="0" max="1" step="0.05" value="0.5"><span class="val" id="mdDimV">0.5</span></div></div>
+          <div><label class="f">شدة التوهج Glow</label>
+            <div class="range-row"><input type="range" id="mdGlow" min="0" max="1" step="0.05" value="0.4"><span class="val" id="mdGlowV">0.4</span></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>الموسيقى Music</h2>
+        <div class="form-grid">
+          <div class="full"><label class="f">رابط المقطوعة URL (MP3)</label><input type="url" id="mdMusic" placeholder="https://.../track.mp3"></div>
+          <div><label class="f">رفع ملف MP3</label><input type="file" id="mdMusicFile" accept="audio/*"></div>
+          <div><label class="f">التشغيل التلقائي Autoplay</label>
+            <select id="mdAuto"><option value="false">لا</option><option value="true">نعم (أول نقرة)</option></select></div>
+          <div><label class="f">مستوى الصوت</label>
+            <div class="range-row"><input type="range" id="mdVol" min="0" max="1" step="0.05" value="0.5"><span class="val" id="mdVolV">0.5</span></div></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="Media.save()">حفظ الوسائط</button>
+    </div>
+
+    <!-- DISCORD -->
+    <div class="panel" data-panel="discord" style="display:none">
+      <div class="page-head"><h1>Discord Rich Presence</h1><p>الحالة الحية عبر Lanyard API — حضور أونلاين + ما تلعب الآن</p></div>
+      <div class="card">
+        <h2>الإعداد</h2>
+        <div class="form-grid">
+          <div class="full"><label class="f">Discord User ID</label><input type="text" id="dcId" placeholder="123456789012345678"></div>
+        </div>
+        <div class="hint">
+          • افتح Discord → Settings → Advanced → Developer Mode.<br>
+          • كليك يمين على اسمك بالموقع → Copy User ID.<br>
+          • ثم انضم لسيرفر (Lanyard) في: <code>discord.gg/lanyard</code> حتى يعمل العرض.<br>
+          • احفظ ثم افتح الموقع لترى حالتك الحية.
+        </div>
+        <div style="margin-top:16px"><button class="btn btn-primary" onclick="Discord.save()">حفظ</button></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

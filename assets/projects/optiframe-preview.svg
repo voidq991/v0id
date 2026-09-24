@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="10%" r="130%">
+      <stop offset="0%" stop-color="#1b1438"/>
+      <stop offset="100%" stop-color="#0a0812"/>
+    </radialGradient>
+    <linearGradient id="acc12" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7b5cff"/>
+      <stop offset="100%" stop-color="#c25cff"/>
+    </linearGradient>
+    <linearGradient id="accgrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7b5cff"/>
+      <stop offset="55%" stop-color="#a970ff"/>
+      <stop offset="100%" stop-color="#c25cff"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="blurbg" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <circle cx="70" cy="55" r="160" fill="#7b5cff" opacity="0.25" filter="url(#blurbg)"/>
+  <circle cx="590" cy="390" r="180" fill="#c25cff" opacity="0.2" filter="url(#blurbg)"/>
+
+  <!-- ============ LEFT: LOGIN SCREEN "OPTI FPS" ============ -->
+  <g>
+    <rect x="24" y="20" width="270" height="360" rx="16" fill="#0d0a1a" opacity="0.92" stroke="#241c4a"/>
+    <rect x="24" y="20" width="6" height="360" rx="3" fill="url(#accgrad)" opacity="0.9"/>
+
+    <text x="159" y="70" font-family="Segoe UI, sans-serif" font-weight="800" font-size="26" fill="#e9e4ff" text-anchor="middle" filter="url(#glow)">OPTI <tspan fill="#c25cff">FPS</tspan></text>
+    <text x="159" y="92" font-family="Segoe UI, sans-serif" font-size="10.5" fill="#8e7fb8" text-anchor="middle">Sign in to continue</text>
+
+    <text x="46" y="126" font-family="Segoe UI, sans-serif" font-size="10.5" fill="#8e7fb8">USERNAME</text>
+    <rect x="46" y="134" width="226" height="32" rx="8" fill="#080611" stroke="#241c4a"/>
+    <text x="58" y="155" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#3a3160">you@mail.com</text>
+
+    <text x="46" y="192" font-family="Segoe UI, sans-serif" font-size="10.5" fill="#8e7fb8">PASSWORD</text>
+    <rect x="46" y="200" width="226" height="32" rx="8" fill="#080611" stroke="#7b5cff" stroke-opacity="0.55"/>
+    <text x="58" y="221" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#3a3160">••••••••</text>
+
+    <rect x="46" y="248" width="226" height="34" rx="10" fill="url(#accgrad)">
+      <animate attributeName="opacity" values="0.88;1;0.88" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <text x="159" y="271" font-family="Segoe UI, sans-serif" font-weight="700" font-size="13" fill="#fff" text-anchor="middle">Login</text>
+
+    <rect x="46" y="300" width="62" height="18" rx="5" fill="#7b5cff" opacity="0.2" stroke="#7b5cff"/>
+    <rect x="50" y="304" width="8" height="10" rx="2" fill="#7b5cff"/>
+    <text x="66" y="314" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#a970ff">Auto Login</text>
+
+    <rect x="154" y="300" width="72" height="18" rx="5" fill="#7b5cff" opacity="0.2" stroke="#7b5cff"/>
+    <rect x="158" y="304" width="8" height="10" rx="2" fill="#7b5cff"/>
+    <text x="174" y="314" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#a970ff">Save Info</text>
+
+    <rect x="46" y="338" width="226" height="1.2" fill="#241c4a"/>
+    <text x="159" y="358" font-family="Segoe UI, sans-serif" font-size="9" fill="#5c5088" text-anchor="middle">⚡ OPTIFPS Tweaks v1.0</text>
+  </g>
+
+  <!-- ============ RIGHT: DASHBOARD ============ -->
+  <g>
+    <!-- sidebar -->
+    <rect x="304" y="20" width="120" height="360" rx="0" fill="#0e0a1c" opacity="0.95" stroke="#241c4a" stroke-width="1"/>
+    <rect x="310" y="20" width="2" height="360" fill="url(#accgrad)" opacity="0.7"/>
+    <text x="324" y="48" font-family="Segoe UI, sans-serif" font-weight="800" font-size="12" fill="#fff">OPTIFPS</text>
+    <text x="324" y="62" font-family="Segoe UI, sans-serif" font-weight="800" font-size="9" fill="#c25cff" letter-spacing="2">TWEAKS</text>
+
+    <rect x="310" y="72" width="108" height="22" rx="6" fill="#7b5cff" opacity="0.28" stroke="#7b5cff" stroke-opacity="0.7"/>
+    <text x="322" y="87" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#fff" font-weight="600">◈ Home</text>
+    <text x="322" y="120" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#8e7fb8">Backups</text>
+    <text x="322" y="145" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#8e7fb8">Fixes</text>
+    <text x="322" y="170" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#8e7fb8">General</text>
+    <text x="322" y="195" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#8e7fb8">Apps</text>
+    <text x="322" y="220" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#8e7fb8">Network</text>
+    <text x="322" y="245" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#8e7fb8">BIOS</text>
+    <text x="322" y="270" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#8e7fb8">Debug</text>
+    <rect x="310" y="282" width="108" height="22" rx="6" fill="#7b5cff" opacity="0.16"/>
+    <text x="322" y="297" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#c9a2ff" font-weight="600">Gaming Tools</text>
+    <rect x="310" y="309" width="108" height="22" rx="6" fill="#7b5cff" opacity="0.16"/>
+    <text x="322" y="324" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#c9a2ff" font-weight="600">Bloatware</text>
+    <rect x="310" y="336" width="108" height="22" rx="6" fill="url(#accgrad)" opacity="0.35" stroke="#a970ff"/>
+    <text x="322" y="351" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#fff" font-weight="700">✦ AI BOOST</text>
+    <circle cx="404" cy="366" r="3.5" fill="#7b5cff">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- main area -->
+    <rect x="424" y="20" width="192" height="360" fill="#110d22"/>
+
+    <text x="438" y="46" font-family="Segoe UI, sans-serif" font-weight="800" font-size="13" fill="#fff">AI BOOST</text>
+    <text x="596" y="44" font-family="Segoe UI, sans-serif" font-size="8" fill="#8e7fb8">Optimize your games</text>
+    <rect x="438" y="54" width="164" height="1.5" fill="url(#accgrad)" opacity="0.5"/>
+
+    <!-- custom game card -->
+    <rect x="438" y="70" width="164" height="74" rx="10" fill="#171230" stroke="#7b5cff" stroke-opacity="0.6"/>
+    <text x="452" y="92" font-family="Segoe UI, sans-serif" font-weight="700" font-size="11" fill="#fff">Custom Game</text>
+    <rect x="452" y="100" width="136" height="22" rx="6" fill="#0e0a1c" stroke="#2a2154"/>
+    <text x="462" y="115" font-family="Segoe UI, sans-serif" font-size="9" fill="#8e7fb8">type game name…</text>
+
+    <!-- result -->
+    <rect x="438" y="152" width="164" height="34" rx="9" fill="#171230" stroke="#2a2154"/>
+    <circle cx="452" cy="169" r="4" fill="#22c55e">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite"/>
+    </circle>
+    <text x="466" y="173" font-family="Segoe UI, sans-serif" font-size="9.5" fill="#a9f0c0" font-weight="600">Boost applied ✓ · FPS +32</text>
+
+    <!-- game grid -->
+    <g>
+      <rect x="438" y="202" width="50" height="52" rx="8" fill="#171230" stroke="#2a2154"/>
+      <text x="463" y="222" font-family="Segoe UI, sans-serif" font-size="8" fill="#c9b8f5" text-anchor="middle" font-weight="700">DISCORD</text>
+      <circle cx="463" cy="238" r="4" fill="#7b5cff" opacity="0.9"/>
+      <rect x="494" y="202" width="50" height="52" rx="8" fill="#171230" stroke="#2a2154"/>
+      <text x="519" y="222" font-family="Segoe UI, sans-serif" font-size="8" fill="#c9b8f5" text-anchor="middle" font-weight="700">CHROME</text>
+      <rect x="550" y="202" width="52" height="52" rx="8" fill="#171230" stroke="#2a2154"/>
+      <text x="576" y="222" font-family="Segoe UI, sans-serif" font-size="8" fill="#c9b8f5" text-anchor="middle" font-weight="700">SPOTIFY</text>
+      <rect x="438" y="262" width="50" height="52" rx="8" fill="#171230" stroke="#2a2154"/>
+      <text x="463" y="282" font-family="Segoe UI, sans-serif" font-size="8" fill="#c9b8f5" text-anchor="middle" font-weight="700">VALOR</text>
+      <rect x="494" y="262" width="50" height="52" rx="8" fill="#7b5cff" opacity="0.28" stroke="#a970ff"/>
+      <text x="519" y="282" font-family="Segoe UI, sans-serif" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">FORTNITE</text>
+      <rect x="550" y="262" width="52" height="52" rx="8" fill="#171230" stroke="#2a2154"/>
+      <text x="576" y="282" font-family="Segoe UI, sans-serif" font-size="8" fill="#c9b8f5" text-anchor="middle" font-weight="700">LOL</text>
+    </g>
+
+    <!-- bottom bar -->
+    <rect x="424" y="336" width="192" height="44" fill="#0e0a1c" stroke="#241c4a" stroke-width="1"/>
+    <circle cx="438" cy="353" r="3.5" fill="#7b5cff">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="450" y="357" font-family="Segoe UI, sans-serif" font-size="8" fill="#8e7fb8">Ready · v1.0 · 60 FPS mode</text>
+  </g>
+
+</svg>
