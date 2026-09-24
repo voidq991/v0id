@@ -210,3 +210,13 @@ input[type=range] { accent-color: var(--accent); cursor: pointer; }
   .sidebar { width: 100%; height: auto; position: relative; border-inline-end: none; border-bottom: 1px solid var(--border); }
   .main { padding: 22px; }
 }
+
+/* ---------- avatar live preview ---------- */
+.avatar-prev { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.5); }
+
+/* ---------- playlist rows ---------- */
+.pl-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #0d0920; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+.pl-row .pl-info { min-width: 0; }
+.pl-row .pl-title { font-weight: 700; font-size: 14px; }
+.pl-row .pl-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.pl-row .pl-actions { display: flex; gap: 8px; flex-shrink: 0; }

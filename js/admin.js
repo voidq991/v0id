@@ -129,6 +129,7 @@
       await loadProjects();
       await loadAbout();
       await loadSettings();
+      await loadPlaylist();
     } catch (e) { toast('خطأ في التحميل: ' + e.message); }
   }
 
@@ -157,7 +158,32 @@
     setVal('pfJourneyEn', p.journey_en);
     setVal('pfSkillsAr', p.skills_ar);
     setVal('pfSkillsEn', p.skills_en);
+    Avatar.preview();
   }
+
+  // live avatar preview (solves "image doesn't show in profile")
+  window.Avatar = {
+    preview() {
+      const wrap = $('pfAvatarPrev');
+      if (!wrap) return;
+      const src = $('pfAvatar') ? val('pfAvatar') : '';
+      wrap.innerHTML = src
+        ? '<img src="' + esc(src) + '" alt="avatar" class="avatar-prev" onerror="this.style.display=\'none\'">'
+        : '<span class="hint">سيظهر هنا معاينة الصورة التي ترفعها أو تلصقها.</span>';
+    },
+    fileChange: (() => {
+      const inp = $('pfAvatarFile');
+      if (!inp) return null;
+      inp.addEventListener('change', () => {
+        const f = inp.files && inp.files[0];
+        if (!f) return;
+        const rd = new FileReader();
+        rd.onload = (ev) => { const w = $('pfAvatarPrev'); if (w) w.innerHTML = '<img src="' + ev.target.result + '" alt="avatar" class="avatar-prev">'; };
+        rd.readAsDataURL(f);
+      });
+      return null;
+    })(),
+  };
 
   window.Profile.save = async function () {
     const img = await uploadInput('pfAvatarFile', '/avatars/avatar_' + Date.now());
@@ -448,6 +474,13 @@
     setVal('mdDim', s.bg_dim); setVal('mdDimV', s.bg_dim);
     setVal('mdGlow', s.bg_glow); setVal('mdGlowV', s.bg_glow);
     setVal('mdMusic', s.music_url);
+    setVal('mdTStart', s.music_start);
+    setVal('mdTEnd', s.music_end);
+    setVal('mdTitle', s.music_title);
+    setVal('mdCover', s.music_cover);
+    setVal('mdPStyle', s.music_pstyle || 'bg');
+    setVal('mdPColor', s.music_pcolor);
+    setVal('mdPBlur', s.music_pblur); setVal('mdPBlurV', s.music_pblur);
     setVal('mdAuto', String(s.music_autoplay));
     setVal('mdVol', s.music_volume); setVal('mdVolV', s.music_volume);
     setVal('dcId', s.discord_user_id);
@@ -480,6 +513,11 @@
     if (mFile && mFile.files.length) {
       musicUrl = await uploadFile(mFile.files[0], '/music/track_' + Date.now() + ext(mFile.files[0].name));
     }
+    let coverUrl = val('mdCover');
+    const cFile = $('mdCoverFile');
+    if (cFile && cFile.files.length) {
+      coverUrl = await uploadFile(cFile.files[0], '/covers/cover_' + Date.now() + ext(cFile.files[0].name));
+    }
     const { error } = await supabase.from('settings').update({
       bg_type: val('mdType'),
       bg_url: bgUrl,
@@ -487,12 +525,93 @@
       bg_dim: parseFloat(val('mdDim')),
       bg_glow: parseFloat(val('mdGlow')),
       music_url: musicUrl,
+      music_start: parseFloat(val('mdTStart')) || 0,
+      music_end: parseFloat(val('mdTEnd')) || 0,
+      music_title: val('mdTitle').trim(),
+      music_cover: coverUrl,
+      music_pstyle: val('mdPStyle'),
+      music_pcolor: val('mdPColor') || null,
+      music_pblur: parseFloat(val('mdPBlur')) || 10,
       music_autoplay: val('mdAuto') === 'true',
       music_volume: parseFloat(val('mdVol')),
     }).eq('id', 1);
     if (error) { toast('خطأ: ' + error.message); return; }
     toast('تم حفظ الوسائط ✓');
   };
+
+  // ============================================================
+  //  PLAYLIST
+  // ============================================================
+  window.Playlist = {};
+  async function loadPlaylist() {
+    let { data } = await supabase.from('music_tracks').select('*').order('sort_order');
+    if (!data) data = [];
+    renderPlaylist(data);
+  }
+
+  function renderPlaylist(rows) {
+    const box = $('plList');
+    if (!box) return;
+    if (!rows.length) { box.innerHTML = '<div class="hint">لا توجد أغانٍ في القائمة بعد.</div>'; return; }
+    box.innerHTML = rows.map((t, i) => (
+      '<div class="pl-row">' +
+        '<div class="pl-info">' +
+          '<div class="pl-title">' + esc(t.title || ('Track ' + (i + 1))) + '</div>' +
+          '<div class="pl-sub">' + esc(t.url) + (t.start_sec ? ' · من ' + t.start_sec + 'ث' : '') + (t.end_sec ? ' إلى ' + t.end_sec + 'ث' : '') + '</div>' +
+        '</div>' +
+        '<div class="pl-actions">' +
+          '<button class="btn btn-sm btn-ghost" onclick="Playlist.up(' + i + ')">▲</button>' +
+          '<button class="btn btn-sm btn-ghost" onclick="Playlist.down(' + i + ')">▼</button>' +
+          '<button class="btn btn-sm btn-danger" onclick="Playlist.del("' + t.id + '")">حذف</button>' +
+        '</div>' +
+      '</div>'
+    )).join('');
+  }
+
+  window.Playlist.add = async function () {
+    const url = val('plUrl').trim();
+    if (!url) { toast('أدخل رابط MP3 أو ارفع ملف'); return; }
+    const fEl = $('plFile');
+    let finalUrl = url;
+    if (fEl && fEl.files.length) {
+      finalUrl = await uploadFile(fEl.files[0], '/music/pl_' + Date.now() + ext(fEl.files[0].name));
+    }
+    const { data, error } = await supabase.from('music_tracks').insert({
+      title: val('plTitle').trim(),
+      url: finalUrl,
+      start_sec: parseFloat(val('plStart')) || 0,
+      end_sec: parseFloat(val('plEnd')) || 0,
+      cover: (val('plCover') || '').trim() || null,
+      visible: true,
+      sort_order: 0,
+    }).select();
+    if (error) { toast('خطأ: ' + error.message); return; }
+    toast('أُضيفت الأغنية ✓');
+    clearForm(['plTitle', 'plUrl', 'plStart', 'plEnd', 'plCover']);
+    if (fEl) fEl.value = '';
+    loadPlaylist();
+  };
+
+  window.Playlist.del = async function (id) {
+    if (!confirm('حذف هذه الأغنية من القائمة؟')) return;
+    const { error } = await supabase.from('music_tracks').delete().eq('id', id);
+    if (error) { toast('خطأ: ' + error.message); return; }
+    toast('حذفت الأغنية');
+    loadPlaylist();
+  };
+
+  async function moveRow(i, dir) {
+    const { data } = await supabase.from('music_tracks').select('id, sort_order').order('sort_order');
+    if (!data || data.length < 2) return;
+    const j = i + dir;
+    if (j < 0 || j >= data.length) return;
+    const a = data[i], b = data[j];
+    await supabase.from('music_tracks').update({ sort_order: b.sort_order }).eq('id', a.id);
+    await supabase.from('music_tracks').update({ sort_order: a.sort_order }).eq('id', b.id);
+    loadPlaylist();
+  }
+  window.Playlist.up = (i) => moveRow(i, -1);
+  window.Playlist.down = (i) => moveRow(i, 1);
 
   // ============================================================
   //  DISCORD
@@ -543,7 +662,7 @@
   function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
 
   // range value labels
-  ['apGlow', 'mdBlur', 'mdDim', 'mdGlow', 'mdVol'].forEach(id => {
+  ['apGlow', 'mdBlur', 'mdDim', 'mdGlow', 'mdVol', 'mdPBlur'].forEach(id => {
     $(id) && $(id).addEventListener('input', () => { const l = $(id + 'V'); if (l) l.textContent = $(id).value; });
   });
 

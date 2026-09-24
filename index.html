@@ -53,14 +53,23 @@
       <!-- Social links -->
       <div class="socials" id="socials"></div>
 
-      <!-- Music player -->
+<!-- Music player -->
       <div class="musicbar" id="musicbar" style="display:none">
-        <div class="music-box">
-          <button class="music-btn" id="musicToggle" title="Music">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </button>
+        <div class="music-box" id="musicBox">
+          <div class="music-cover" id="musicCoverWrap" style="display:none"><img id="musicCover" alt=""></div>
+          <div class="music-side">
+            <button class="music-btn music-btn-small" id="musicPrev" title="Prev">
+              <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+            </button>
+            <button class="music-btn" id="musicToggle" title="Music">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="music-btn music-btn-small" id="musicNext" title="Next">
+              <svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+            </button>
+          </div>
           <div class="music-ctrl">
-            <div class="music-track" id="musicTrack">â€”</div>
+            <div class="music-track" id="musicTrack">—</div>
             <input type="range" id="musicSeek" min="0" max="100" value="0">
             <div class="vol-row">
               <span class="vl" id="musicTime">0:00</span>
@@ -69,6 +78,14 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Floating volume control (always visible on the side) -->
+      <div class="float-vol" id="floatVol" style="display:none" title="Volume">
+        <div class="fv-icon" id="fvIcon">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zM16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+        </div>
+        <div class="fv-slider"><input type="range" id="fvRange" min="0" max="1" step="0.02" value="0.5"></div>
       </div>
       <p style="margin-top:14px; font-size:12px; color:#8e80bd" id="musicHint"></p>
     </div>
@@ -101,6 +118,13 @@
 <script src="js/site.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 

@@ -62,7 +62,11 @@
       <div class="card">
         <h2>البيانات الأساسية (ثنائية اللغة)</h2>
         <div class="form-grid">
-          <div><label class="f">Avatar URL / File</label><input type="file" accept="image/*" id="pfAvatarFile"><div class="hint">أو</div><input type="text" id="pfAvatar" placeholder="avatar url"></div>
+          <div><label class="f">الصورة الرمزية Avatar</label>
+            <input type="file" accept="image/*" id="pfAvatarFile">
+            <div class="hint">أو الصق رابط صورة</div>
+            <input type="text" id="pfAvatar" placeholder="avatar url" oninput="Avatar.preview()">
+            <div id="pfAvatarPrev" style="margin-top:10px"></div></div>
           <div><label class="f">Owner Badge</label><input type="text" id="pfBadge"></div>
           <div><label class="f">الاسم العربي</label><input type="text" id="pfNameAr"></div>
           <div><label class="f">Name (EN)</label><input type="text" id="pfNameEn"></div>
@@ -227,11 +231,53 @@
         <div class="form-grid">
           <div class="full"><label class="f">رابط المقطوعة URL (MP3)</label><input type="url" id="mdMusic" placeholder="https://.../track.mp3"></div>
           <div><label class="f">رفع ملف MP3</label><input type="file" id="mdMusicFile" accept="audio/*"></div>
+
+          <!-- TRIM: only the part you want -->
+          <div class="full" style="border:1px solid rgba(var(--accent-rgb),0.3); border-radius:12px; padding:12px; background:rgba(255,255,255,0.02)">
+            <label class="f">✂️ تقطيع المقطع — شغّل فقط الجزء الذي تريد</label>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr">
+              <div><label class="f">البداية (ثانية)</label><input type="number" id="mdTStart" min="0" step="0.1" value="0"></div>
+              <div><label class="f">النهاية (ثانية — 0 = كاملة)</label><input type="number" id="mdTEnd" min="0" step="0.1" value="0"></div>
+            </div>
+            <div class="hint" style="margin-top:6px">مثال: عندك أغنية 3:00، اكتب البداية 45 والنهاية 90 → يشغّل من 0:45 حتى 1:30 فقط ثم يتوقف.</div>
+          </div>
+
+          <div class="full"><label class="f">عنوان المقطوعة (الاسم الظاهر في اللاعب)</label><input type="text" id="mdTitle" placeholder="My Track"></div>
+          <div><label class="f">غلاف Music Cover</label><input type="file" id="mdCoverFile" accept="image/*">
+            <div class="hint">أو رابط صورة</div>
+            <input type="text" id="mdCover" placeholder="cover url"></div>
+
+          <!-- PLAYER LOOK -->
+          <div class="full"><label class="f">شكل اللاعب Player Style</label>
+            <select id="mdPStyle">
+              <option value="bg">نفس لون الخلفية (شفاف/مطابق)</option>
+              <option value="glass">زجاجي (Blur تمويه)</option>
+              <option value="image">بانر صورة</option>
+              <option value="glow">توهج متدرج</option>
+            </select></div>
+          <div><label class="f">لون اللاعب (اختياري)</label><input type="color" id="mdPColor" value="#7c3aed"></div>
+          <div><label class="f">تمويه اللاعب Blur</label>
+            <div class="range-row"><input type="range" id="mdPBlur" min="0" max="25" value="10"><span class="val" id="mdPBlurV">10</span></div></div>
+
           <div><label class="f">التشغيل التلقائي Autoplay</label>
             <select id="mdAuto"><option value="false">لا</option><option value="true">نعم (أول نقرة)</option></select></div>
           <div><label class="f">مستوى الصوت</label>
             <div class="range-row"><input type="range" id="mdVol" min="0" max="1" step="0.05" value="0.5"><span class="val" id="mdVolV">0.5</span></div></div>
         </div>
+
+        <!-- PLAYLIST -->
+        <h2 style="margin-top:22px">قائمة التشغيل Playlist</h2>
+        <div class="form-grid">
+          <div class="full"><label class="f">عنوان</label><input type="text" id="plTitle" placeholder="Track name"></div>
+          <div class="full"><label class="f">رابط MP3</label><input type="url" id="plUrl" placeholder="https://.../track.mp3"></div>
+          <div class="full"><label class="f">رفع MP3</label><input type="file" id="plFile" accept="audio/*"></div>
+          <div><label class="f">البداية (ثانية)</label><input type="number" id="plStart" min="0" step="0.1" value="0"></div>
+          <div><label class="f">النهاية (0 = كاملة)</label><input type="number" id="plEnd" min="0" step="0.1" value="0"></div>
+          <div><label class="f">غلاف</label><input type="text" id="plCover" placeholder="cover url"></div>
+        </div>
+        <div style="margin-top:14px"><button class="btn btn-primary" onclick="Playlist.add()">أضف للمشغّل</button></div>
+        <div class="list" id="plList" style="margin-top:18px"></div>
+        <div class="hint" style="margin-top:8px">💡 إذا أضفت أغانٍ هنا فستحل القائمة محل المقطوعة الرئيسية — يُشغَّل أول مقطع عند ظهور اللاعب، وكل مقطع يتبعه الذي يليه، مع التقطيع لكل مقطع على حدة.</div>
       </div>
       <button class="btn btn-primary" onclick="Media.save()">حفظ الوسائط</button>
     </div>
